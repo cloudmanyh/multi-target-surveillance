@@ -60,13 +60,6 @@ def dict_value_to_list(D):
 # 功能：根据构造后的图结构，获得图的基本属性
 # 输出：返回图中任意两点之间的最短路径和最短路径遍历途径
 def get_graph_attribute(graph):
-    path=list(nx.all_pairs_dijkstra_path(graph)) # 生成每对节点之间的最短路径
-    path_list = list_sort_by_tuple_id(path) # 最短路径列表按照元组id从小到大排序
-    update_path_list = []
-    for p in path_list:
-        path_dict = p[1]
-        data = dict(sorted(path_dict.items(), key=lambda x: x[0])) # 词典按照key值大小排序 
-        update_path_list.append((p[0],data))
     length=list(nx.all_pairs_dijkstra_path_length(graph)) # 生成每对节点之间的最短距离
     length_list = list_sort_by_tuple_id(length) # 最短距离列表按照元组id从小到大排序
     dis_list = []
@@ -76,6 +69,14 @@ def get_graph_attribute(graph):
         data = dict(sorted(len_dict.items(), key=lambda x: x[0])) # 词典按照key值大小排序
         temp_list = dict_value_to_list(data)
         dis_list.append(temp_list)
+    path = list(nx.all_pairs_dijkstra_path(graph))  # 生成每对节点之间的最短路径
+    path_list = list_sort_by_tuple_id(path)  # 最短路径列表按照元组id从小到大排序
+    update_path_list = []
+    for p in path_list:
+        path_dict = p[1]
+        # 词典按照key值大小排序
+        data = dict(sorted(path_dict.items(), key=lambda x: x[0]))
+        update_path_list.append((p[0], data))
     return dis_list, update_path_list
 
 # 输入：构造后的图结构，节点标签，边标签
@@ -102,6 +103,6 @@ if __name__ == "__main__":
     build_graph(topology, G)
     edge_labels = nx.get_edge_attributes(G,'weight') # 生成连通边标签
     distance_matrix, path = get_graph_attribute(G)
-    print('节点间距离矩阵：\n',distance_matrix)
+    print('节点间距离矩阵：\n',np.array(distance_matrix))
     print('最短间距路径：\n',path)
     draw_graph(G, node_labels, edge_labels)
