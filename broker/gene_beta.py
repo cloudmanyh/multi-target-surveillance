@@ -1,4 +1,11 @@
-# -*-coding:utf-8 -*-
+# -*- encoding: utf-8 -*-
+'''
+Filename         :gene_beta.py
+Description      :
+Time             :2020/08/10 23:22:38
+Author           :Yan Hui
+Version          :1.0
+'''
 import random
 import math
 import numpy as np
@@ -6,6 +13,16 @@ import matplotlib.pyplot as plt
 
 #生成chromosome_length长度的染色体
 def generate_chromosome(chromosome_length):
+    """
+    Arguments
+    染色体长度
+    
+    Functions
+    生成特定长度的染色体
+    
+    Returns
+    生成的染色体
+    """
     chromosome = []
     # 生成特定长度的染色体
     for j in range(chromosome_length):
@@ -215,6 +232,14 @@ def result_show(optimal_func_list, optimal_var_list, optimal_pop_list, optimal_t
     trend_show(optimal_func_list, optimal_type, y_range)
 
 def trend_show(optimal_func_list, optimal_type, y_range):
+    """
+    Arguments
+    最优值列表，优化类型，函数值范围
+    Functions
+    绘制遗传算法最优值变化趋势
+    Returns
+    无返回
+    """
     # optimal_func_list.sort(reverse = optimal_type)
     func_num = len(optimal_func_list)
     X = list(range(func_num))
