@@ -94,8 +94,6 @@ def draw_graph(graph, node_labels, edge_labels):
     plt.yticks([])
     plt.show()
 
-
-
 if __name__ == "__main__":
     target_number, connectivity = 5, 0.6
     G = nx.Graph()

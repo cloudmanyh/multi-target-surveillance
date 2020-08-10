@@ -19,7 +19,7 @@ class paraTags:
     trackTimeStatisticsPath = 'track/TrackTimeStatistics.csv'
     # **********无人车参数**********
     ugvNum = 5  # 无人车数量
-    priorityLower = 0  # 无人车优先级下限
+    priorityLower = 1  # 无人车优先级下限
     priorityUpper = int(ugvNum * 0.8) + 1  # 无人车优先级上限
     # **********无人机参数**********
     uavNum = 10  # 无人机数量

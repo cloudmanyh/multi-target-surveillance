@@ -108,19 +108,22 @@ def uavParaSetting():
     uavParaList = list()
     for k in range(paraTags.uavNum):
         uavState = []
-        uavType = random.randint(1, 3)
-        if uavType == 1:
-            uavState.append(paraTags.uavEnergy1)
-            uavState.append(paraTags.uavEnergyPower1)
-            uavState.append(paraTags.uavSpeed1)
-        elif uavType == 2:
-            uavState.append(paraTags.uavEnergy2)
-            uavState.append(paraTags.uavEnergyPower2)
-            uavState.append(paraTags.uavSpeed2)
-        else:
-            uavState.append(paraTags.uavEnergy3)
-            uavState.append(paraTags.uavEnergyPower3)
-            uavState.append(paraTags.uavSpeed3)
+        uavState.append(paraTags.uavEnergy2)
+        uavState.append(paraTags.uavEnergyPower2)
+        uavState.append(paraTags.uavSpeed2)
+        # uavType = random.randint(1, 1)
+        # if uavType == 1:
+        #     uavState.append(paraTags.uavEnergy1)
+        #     uavState.append(paraTags.uavEnergyPower1)
+        #     uavState.append(paraTags.uavSpeed1)
+        # elif uavType == 2:
+        #     uavState.append(paraTags.uavEnergy2)
+        #     uavState.append(paraTags.uavEnergyPower2)
+        #     uavState.append(paraTags.uavSpeed2)
+        # else:
+        #     uavState.append(paraTags.uavEnergy3)
+        #     uavState.append(paraTags.uavEnergyPower3)
+        #     uavState.append(paraTags.uavSpeed3)
         uavParaList.append(uavState)
     writeList2CSV(uavParaList, paraTags.energyPath)
     energyResult = readCSV2List(paraTags.energyPath)
@@ -134,6 +137,7 @@ def colorDictSetting():
     colorResult = readCSV2List(paraTags.colorPath)
     colorDict = List2Dict(colorResult)
     print(colorDict)
+# 根据目标数量和目标间连接度生成目标无向图
 def graph_setting():
     G = nx.Graph()
     topology, node_labels = graph.generate_topology(paraTags.ugvNum, paraTags.connectivity)
@@ -159,6 +163,6 @@ if __name__ == "__main__":
     uavParaSetting()
     # 根据无人机数量，生成无人机画图对应颜色词典
     colorDictSetting()
-
+    # 生成节点图属性
     graph_setting()
     
