@@ -1,6 +1,14 @@
 from scipy.optimize import linear_sum_assignment
 import numpy as np  # 使用import导入模块numpy，并简写成np
-cost =np.array([[3,1,2],[4,3,4],[2,5,1]])
+cost = np.random.randint(1,9, (6,6))
+def construct_cost_matrix(delta_state, distance_matrix):
+    cost_matrix = []
+    
+    return cost_matrix
+print(cost)
+# 输入：任务分配成本
+# 功能：匈牙利法找到最优分配方式
+# 输出：最优分配方式对应的输出点编号，输入点编号，对应分配成本
 def optimize(cost):
     row_ind, col_ind=linear_sum_assignment(cost)
     cost_ind = cost[row_ind,col_ind]
