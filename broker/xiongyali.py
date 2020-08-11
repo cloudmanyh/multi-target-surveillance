@@ -1,10 +1,23 @@
+# -*- encoding: utf-8 -*-
+'''
+@File    :   xiongyali.py
+@Time    :   2020/08/11 10:41:13
+@Author  :   Yan Hui 
+@Version :   1.0
+@Contact :   yanhui13@nudt.edu.cn
+'''
 from scipy.optimize import linear_sum_assignment
 import numpy as np  
 
-# 输入：状态相对变化列表， 无向图各个节点之间最短路径矩阵
-# 功能：根据状态变化情况和无向图最短路径矩阵，构造优化问题cost矩阵
-# 输出：优化问题cost矩阵，输出点图id列表，输入点图id列表
 def construct_cost_matrix(delta_state, distance_matrix):
+    """
+    @description:
+    根据状态变化情况和无向图最短路径矩阵，构造优化问题cost矩阵
+    @param:
+    状态相对变化列表, 无向图各个节点之间最短路径矩阵
+    @Returns:
+    优化问题cost矩阵，输出点图id列表，输入点图id列表
+    """
     cost_list = []
     out_id_list = []
     in_id_list = []
@@ -22,10 +35,15 @@ def construct_cost_matrix(delta_state, distance_matrix):
         cost_list.append(tmp_cost)
     return np.array(cost_list), out_id_list, in_id_list
 
-# 输入：任务分配成本
-# 功能：匈牙利法找到最优分配方式
-# 输出：最优分配方式对应的输出点矩阵id列表，输入点id列表，对应分配成本列表，总体成本
 def optimize(cost):
+    """
+    @description:
+    匈牙利法找到最优分配方式
+    @param:
+    任务分配成本
+    @Returns:
+    最优分配方式对应的输出点矩阵id列表，输入点id列表，对应分配成本列表，总体成本
+    """
     out_id, in_id = linear_sum_assignment(cost)
     cost_index = cost[out_id, in_id]
     total_cost = round(cost[out_id, in_id].sum(), 1)

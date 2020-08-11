@@ -1,3 +1,11 @@
+# -*- encoding: utf-8 -*-
+'''
+@File    :   newtest.py
+@Time    :   2020/08/11 09:20:08
+@Author  :   Yan Hui 
+@Version :   1.0
+@Contact :   yanhui13@nudt.edu.cn
+'''
 import graph
 import xiongyali as XYL
 import numpy as np  # 使用import导入模块numpy，并简写成np
@@ -57,3 +65,4 @@ if __name__ == "__main__":
         cost = cost_index[i]
         system_strategy.append([former, current, cost])
     print(system_strategy)
+

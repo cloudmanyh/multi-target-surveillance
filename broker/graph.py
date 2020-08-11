@@ -10,6 +10,14 @@ plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
 # 功能：根据目标点数量与节点点连接度，生成目标点之间的加权无向拓扑结构图
 # 输出：返回网络拓扑信息列表和节点标签信息
 def generate_topology(target_number, connectivity):
+    """
+    @description:
+    ---------
+    @param:
+    根据目标点数量与节点点连接度，生成加权无向拓扑结构图
+    @Returns:
+    -------
+    """
     topology = []
     labels = {}
     node_id_list = []

@@ -127,6 +127,7 @@ if __name__ == "__main__":
     # 读取事先生成的电量和状态列表信息
     ugvStateList = readCSV2List(paraTags.statePath)
     uavStateList = readCSV2List(paraTags.energyPath)
+    distanceList = readCSV2List(paraTags.graphLengthPath)
     colorList = readCSV2List(paraTags.colorPath)
     colorDict = List2Dict(colorList)
     #初始化无人机列表
@@ -154,22 +155,26 @@ if __name__ == "__main__":
     if paraTags.algChoose == 1:
         filePath = 'First_Come_First_Out/'
         initFileDir(filePath)
-        broker = Broker(uavList, ugvList, ugvStateList, colorDict, filePath)
+        broker = Broker(uavList, ugvList, ugvStateList,
+                        distanceList, colorDict, filePath)
         broker.First_Come_First_Out()
-    elif paraTags.algChoose == 2:
-        filePath = 'Energy_High_First_Out/'
-        initFileDir(filePath)
-        broker = Broker(uavList, ugvList, ugvStateList, colorDict, filePath)
-        broker.Energy_High_First_Out()
-    elif paraTags.algChoose == 3:
-        filePath = 'Load_Balance_By_Cooperation/'
-        initFileDir(filePath)
-        broker = Broker(uavList, ugvList, ugvStateList, colorDict, filePath)
-        broker.Load_Balance_By_Cooperation()
-    elif paraTags.algChoose == 4:
-        filePath = 'Load_Balance_Energy_Efficient/'
-        initFileDir(filePath)
-        broker = Broker(uavList, ugvList, ugvStateList, colorDict, filePath)
-        broker.Load_Balance_Energy_Efficient()
+    # elif paraTags.algChoose == 2:
+    #     filePath = 'Energy_High_First_Out/'
+    #     initFileDir(filePath)
+    #     broker = Broker(uavList, ugvList, ugvStateList,
+    #                     distanceList, colorDict, filePath)
+    #     broker.Energy_High_First_Out()
+    # elif paraTags.algChoose == 3:
+    #     filePath = 'Load_Balance_By_Cooperation/'
+    #     initFileDir(filePath)
+    #     broker = Broker(uavList, ugvList, ugvStateList,
+    #                     distanceList, colorDict, filePath)
+    #     broker.Load_Balance_By_Cooperation()
+    # elif paraTags.algChoose == 4:
+    #     filePath = 'Load_Balance_Energy_Efficient/'
+    #     initFileDir(filePath)
+    #     broker = Broker(uavList, ugvList, ugvStateList,
+    #                     distanceList, colorDict, filePath)
+    #     broker.Load_Balance_Energy_Efficient()
     else:
         print('没有选择任何算法')
