@@ -70,7 +70,7 @@ class Broker:
             # 系统状态发生了变化
             print('*********任务调度阶段*********')
             strategyList = generateStrategyList(
-                formerStateList, currentStateList, distanceList, paraTags.uavNum)
+                formerStateList, currentStateList, self.distanceList, paraTags.uavNum)
             clusterStrategyList = generateClusterStrategyList(strategyList)
             clusterUavList = []
             for k in range(len(self.ugvList)):
@@ -140,11 +140,11 @@ class Broker:
 def clusterListZip(uavList,clusterList):
     """
     @description:
-    
+    合并无人机列表与对应无人机聚类后调度策略
     @param:
     无人机列表，聚类调度列表
     @Returns:
-    -------
+    合并后的聚类策略
     """
     if len(clusterList) == len(uavList):
         for m in range(len(clusterList)):
@@ -161,8 +161,6 @@ def clusterListZip(uavList,clusterList):
         print('无人车聚类与调度策略聚类数量不一致')
     return clusterList
 
-
-# 从无人车状态列表中找当前时刻的系统状态
 def getStateList(stateList, index):
     """
     @description:
@@ -170,7 +168,7 @@ def getStateList(stateList, index):
     @param:
     实验设置生成的状态总表，index
     @Returns:
-    np.array类型的装填列表
+    np.array类型的状态列表
     """
     tempStateList = stateList[index]
     targetList = np.array(tempStateList)
@@ -188,7 +186,6 @@ def stateChange(priorState, currentState):
     delta = currentState - priorState
     return delta
 
-#判断系统状态是否发生变化
 def stateJudge(stateDelta):
     """
     @description:
@@ -205,7 +202,6 @@ def stateJudge(stateDelta):
             break
     return judgeReuslt
 
-#输出无人机列表信息
 def uavListPrint(uavList):
     """
     @description:
@@ -219,7 +215,6 @@ def uavListPrint(uavList):
         uav = uavList[j]
         uav.printState()
 
-#输出无人车列表信息
 def ugvListPrint(ugvList):
     """
     @description:
@@ -250,9 +245,6 @@ def uavEenergyJudge(uavList):
             flag = False
             break
     return flag
-
-# 根据无人车每时每刻的系统状态，生成无人机状态向量矩阵
-
 
 def generateStateMatrix(stateList, uavNum):
     """
@@ -287,7 +279,7 @@ def generateStrategyList(formerStateList, currentStateList, distanceList, uavNum
     @param:
     目标上一时刻状态列表，目标当前时刻状态列表，无人机数量
     @Returns:
-    无人机调度策略：[当前Id，目标Id]
+    无人机调度策略：[当前Id, 目标Id, 调度成本]
     """
     distance_matrix = np.array(distanceList)
     print('原始距离矩阵：\n', distance_matrix)
@@ -310,26 +302,7 @@ def generateStrategyList(formerStateList, currentStateList, distanceList, uavNum
         cost = cost_index[i]
         system_strategy.append([former, current, cost])
     print(system_strategy)
-
-
-
-    
-    strategyList = []
-    for j in range(uavNum):
-        uavStateChange = deltaStateMatrix[:, j]
-        formerState = formerStateMatrix[:,j]
-        uavStrategy = []
-        if np.all(uavStateChange == 0):
-            formerIndex = formerState.tolist().index(1) # 从无人机上一时刻状态表中寻找对应无人车Id
-            currentId, targetId =formerIndex, formerIndex  # 表示无人机的位置信息不发生变化
-        else:
-            uavStateChangeList = uavStateChange.tolist()
-            currentId = uavStateChangeList.index(-1)
-            targetId = uavStateChangeList.index(1)
-        uavStrategy.append(currentId)
-        uavStrategy.append(targetId)
-        strategyList.append(uavStrategy)
-    return strategyList
+    return system_strategy
 
 def generateClusterStrategyList(strategyList):
     """
@@ -362,7 +335,7 @@ def generateClusterStrategyList(strategyList):
             for j in range(0, n - i - 1):
                 strategy0 = cluster[j]
                 strategy1 = cluster[j + 1]
-                if abs(strategy0[0] - strategy0[1]) < abs(strategy1[0] - strategy1[1]):
+                if strategy0[-1] < strategy1[-1]:
                     cluster[j], cluster[j + 1] = cluster[j + 1], cluster[j]
     return clusterList
 

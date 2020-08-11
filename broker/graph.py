@@ -6,17 +6,15 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
 plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
 
-# 输入：节点数量和节点间连接度
-# 功能：根据目标点数量与节点点连接度，生成目标点之间的加权无向拓扑结构图
-# 输出：返回网络拓扑信息列表和节点标签信息
+
 def generate_topology(target_number, connectivity):
     """
     @description:
-    ---------
+    目标点数量和节点间连接度
     @param:
     根据目标点数量与节点点连接度，生成加权无向拓扑结构图
     @Returns:
-    -------
+    拓扑列表, 目标点标签
     """
     topology = []
     labels = {}
@@ -36,17 +34,27 @@ def generate_topology(target_number, connectivity):
         labels[k] = str(k)
     return topology, labels
 
-# 输入：空白图结构和网络拓扑信息列表
-# 功能：根据目标点数量与目标点连接度，生成目标点之间的加权无向拓扑结构图
-# 输出：无返回值
 def build_graph(topology, graph):
+    """
+    @description:
+    生成目标点之间的加权无向拓扑结构图
+    @param:
+    空白图结构和网络拓扑信息列表
+    @Returns:
+    无返回
+    """
     for t in topology:
         graph.add_edge(t[0], t[1], weight=t[2])
 
-# 输入：元素为元组的列表，元组第一位为节点id
-# 功能：根据节点id从小到大的顺序，对列表重新排序
-# 输出：返回排序后的列表
 def list_sort_by_tuple_id(L):
+    """
+    @description:
+    根据目标点ID从小到大的顺序，对列表重新排序
+    @param:
+    元组构成的列表，元组第一位为目标点ID
+    @Returns:
+    排序后的列表
+    """
     sorted_list = []
     for i in range(len(L)):
         for l in L:
@@ -55,19 +63,29 @@ def list_sort_by_tuple_id(L):
                 break
     return sorted_list
 
-# 输入：词典
-# 功能：将词典中所有元素的value值合为一个list
-# 输出：合成后的list
 def dict_value_to_list(D):
+    """
+    @description:
+    将词典中所有元素的value值合为一个list
+    @param:
+    词典
+    @Returns:
+    合成后的list
+    """
     L = []
     for i in D.keys():
         L.append(D[i])
     return L
 
-# 输入：构造后的图结构
-# 功能：根据构造后的图结构，获得图的基本属性
-# 输出：返回图中任意两点之间的最短路径和最短路径遍历途径
 def get_graph_attribute(graph):
+    """
+    @description:
+    获得图的基本属性
+    @param:
+    构造后的图结构
+    @Returns:
+    返回图中任意两点之间的最短路径和最短路径遍历途径
+    """
     length=list(nx.all_pairs_dijkstra_path_length(graph)) # 生成每对节点之间的最短距离
     length_list = list_sort_by_tuple_id(length) # 最短距离列表按照元组id从小到大排序
     dis_list = []
@@ -87,10 +105,15 @@ def get_graph_attribute(graph):
         update_path_list.append((p[0], data))
     return dis_list, update_path_list
 
-# 输入：构造后的图结构，节点标签，边标签
-# 功能：根据构造后的图结构，节点标签，边标签，可视化形式绘制图结构
-# 输出：无返回值
 def draw_graph(graph, node_labels, edge_labels):
+    """
+    @description:
+    构造后的图结构，节点标签，边标签
+    @param:
+    可视化形式绘制图结构
+    @Returns:
+    无返回值
+    """
     pos=nx.spring_layout(graph) # 生成节点位置 
     nx.draw_networkx_nodes(graph,pos,node_color='#FFE4C4',node_size=300,alpha=1) # 把节点画出来
     nx.draw_networkx_edges(graph,pos,width=1.0,alpha=1,edge_color='#800080') # 把边画出来 

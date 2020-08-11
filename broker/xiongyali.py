@@ -12,9 +12,9 @@ import numpy as np
 def construct_cost_matrix(delta_state, distance_matrix):
     """
     @description:
-    根据状态变化情况和无向图最短路径矩阵，构造优化问题cost矩阵
+    构造优化问题cost矩阵
     @param:
-    状态相对变化列表, 无向图各个节点之间最短路径矩阵
+    状态相对变化列表, 无向图节点之间最短路径矩阵
     @Returns:
     优化问题cost矩阵，输出点图id列表，输入点图id列表
     """
@@ -40,9 +40,9 @@ def optimize(cost):
     @description:
     匈牙利法找到最优分配方式
     @param:
-    任务分配成本
+    优化问题cost矩阵
     @Returns:
-    最优分配方式对应的输出点矩阵id列表，输入点id列表，对应分配成本列表，总体成本
+    输出点矩阵id列表，输入点id列表，分配成本列表，总体成本
     """
     out_id, in_id = linear_sum_assignment(cost)
     cost_index = cost[out_id, in_id]
