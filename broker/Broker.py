@@ -76,8 +76,8 @@ class Broker:
             for k in range(len(self.ugvList)):
                 ug = self.ugvList[k]
                 if len(ug.follow_UAV_Id_List) > 0:
-                    tempList = energySort(ug.follow_UAV_Id_List, self.uavList)
-                    clusterUavList.append(tempList)
+                    follow_id_list = energySort(ug.follow_UAV_Id_List, self.uavList)
+                    clusterUavList.append(follow_id_list)
             clusterStrategyList = clusterListZip(
                 clusterUavList, clusterStrategyList)
             print('聚类后的任务调度策略 ', clusterStrategyList)
@@ -551,7 +551,15 @@ def plot_vector2d(startPoint, endPoint, **options):
                      length_includes_head=True, **options)
 
 # 按照电量下降的顺序对无人机列表排序
-def energySort(uavIdList,uavList):
+def energySort(uavIdList, uavList):
+    """
+    @description:
+    按照电量下降的顺序对无人机列表排序
+    @param:
+    无人机ID列表，无人机列表
+    @Returns:
+    排序后的无人机ID列表
+    """
     n = len(uavIdList)
     # 遍历所有数组元素
     for i in range(n):
