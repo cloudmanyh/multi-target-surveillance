@@ -47,7 +47,9 @@ def readCSV2List(filePath):
 if __name__ == "__main__":
     distance_matrix = np.array(readCSV2List(paraTags.graphLengthPath))
     print('原始距离矩阵：\n', distance_matrix)
-    delta_state = [2, -3, -1, 3, -1]
+    former_state = np.array([1, 4, 2, 1, 2])
+    current_state = np.array([1, 1, 3, 3, 2])
+    delta_state = current_state - former_state
     cost_matrix, out_id_list, in_id_list = XYL.construct_cost_matrix(
         delta_state, distance_matrix)
     print('out_id_list: ', out_id_list)
@@ -65,4 +67,20 @@ if __name__ == "__main__":
         cost = cost_index[i]
         system_strategy.append([former, current, cost])
     print(system_strategy)
-
+    for k in range(len(delta_state)):
+        if delta_state[k] >= 0:
+            m = 0
+            while m < former_state[k]:
+                system_strategy.append([k, k, 0])
+                m += 1
+        if delta_state[k] < 0:
+            m = 0
+            while m < current_state[k]:
+                system_strategy.append([k, k, 0])
+                m += 1
+    print(system_strategy)
+    for i in range(len(system_strategy)):
+            for j in range(0, len(system_strategy) - i - 1):
+                if system_strategy[j][0] > system_strategy[j + 1][0]:
+                    system_strategy[j], system_strategy[j + 1] = system_strategy[j + 1], system_strategy[j]
+    print(system_strategy)

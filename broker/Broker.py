@@ -71,7 +71,7 @@ class Broker:
             # 系统状态发生了变化
             print('*********任务调度阶段*********')
             strategyList = generateStrategyList(
-                formerStateList, currentStateList, self.distanceList, paraTags.uavNum)
+                formerStateList, currentStateList, self.distanceList, self.ugvList)
             clusterStrategyList = generateClusterStrategyList(strategyList)
             clusterUavList = []
             for k in range(len(clusterStrategyList)):
@@ -87,7 +87,7 @@ class Broker:
                 clusterTemp = clusterStrategyList[k]
                 for j in range(len(clusterTemp)):
                     strategy = clusterTemp[j]
-                    if len(strategy) != 3:
+                    if len(strategy) != 4:
                         print('无人机调度策略格式不正确')
                     # 依次读取当前无人车Id，目标无人车Id，执行任务无人机Id
                     currentUgvId = strategy[0]
@@ -95,6 +95,7 @@ class Broker:
                     targetUgvId = strategy[1]
                     targetUgv = IdToUGV(targetUgvId, self.ugvList)
                     uaId = strategy[2]
+                    moveDistance = strategy[3]
                     ua = IdToUAV(uaId, self.uavList)
                     # 进行无人车操作
                     currentUgv.follow_UAV_Id_List.remove(uaId)  # 离开当前无人机
@@ -103,14 +104,9 @@ class Broker:
                     ua.historyTrackIdList.append(currentUgvId)
                     ua.historyEnergyList.append(ua.currentEnergy)
                     ua.currentTrackId = targetUgvId
-                    moveDistance = abs(
-                        currentUgvId - targetUgvId) * paraTags.trackDis
-                    moveTime = round(moveDistance / ua.speed, 3)  # 保留三维小数
+                    moveTime = round(moveDistance / ua.speed, 3)  # 计算无人机的飞行时长
                     ua.motionTime += moveTime
-                    if moveTime * 3600 > paraTags.deadline:
-                        # 说明无人机飞到无人车边上时已经超时
-                        failNum += 1
-                    energyCost = round(moveTime * ua.energyPower, 3)  # 保留三维小数
+                    energyCost = round(moveTime * ua.energyPower, 3)  # 计算无人机的飞行能耗
                     ua.currentEnergy = ua.currentEnergy - energyCost
             print('********无人机和无人车列表信息更新********')
             uavListPrint(self.uavList)
@@ -157,8 +153,6 @@ def clusterListZip(uavList,clusterList):
                     uavStrategy.insert(2,uavId)
             else:
                 print('无人车上跟踪无人机数量与调度策略数量不一致')
-    else:
-        
     return clusterList
 
 def getStateList(stateList, index):
@@ -272,12 +266,12 @@ def generateStateMatrix(stateList, uavNum):
     systemMatrix = np.array(systemList)
     return systemMatrix
 
-def generateStrategyList(formerStateList, currentStateList, distanceList, uavNum):
+def generateStrategyList(formerStateList, currentStateList, distanceList, ugvList):
     """
     @description:
     生成无人机调度策略列表
     @param:
-    目标上一时刻状态列表，目标当前时刻状态列表，无人机数量
+    目标上一时刻状态列表，目标当前时刻状态列表，无人车列表
     @Returns:
     无人机调度策略：[当前Id, 目标Id, 调度成本]
     """
@@ -301,6 +295,24 @@ def generateStrategyList(formerStateList, currentStateList, distanceList, uavNum
         current = in_id_list[in_id[i]]
         cost = cost_index[i]
         system_strategy.append([former, current, cost])
+    print(system_strategy)
+    # 对于不执行任何动作的无人机补齐调度策略，并按照无人机当前跟踪目标id从小到大排序
+    for k in range(len(delta_state)):
+        if delta_state[k] >= 0:
+            m = 0
+            while m < formerStateList[k]:
+                system_strategy.append([k, k, 0])
+                m += 1
+        if delta_state[k] < 0:
+            m = 0
+            while m < currentStateList[k]:
+                system_strategy.append([k, k, 0])
+                m += 1
+    print(system_strategy)
+    for i in range(len(system_strategy)):
+        for j in range(0, len(system_strategy) - i - 1):
+            if system_strategy[j][0] > system_strategy[j + 1][0]:
+                system_strategy[j], system_strategy[j + 1] = system_strategy[j + 1], system_strategy[j]
     print(system_strategy)
     return system_strategy
 
