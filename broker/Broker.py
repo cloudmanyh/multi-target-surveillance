@@ -98,8 +98,9 @@ class Broker:
                     moveDistance = strategy[3]
                     ua = IdToUAV(uaId, self.uavList)
                     # 进行无人车操作
-                    currentUgv.follow_UAV_Id_List.remove(uaId)  # 离开当前无人机
-                    targetUgv.follow_UAV_Id_List.append(uaId)  # 加入目标无人机
+                    if currentUgvId != targetUgvId:
+                        currentUgv.follow_UAV_Id_List.remove(uaId)  # 离开当前无人机
+                        targetUgv.follow_UAV_Id_List.append(uaId)  # 加入目标无人机
                     # 进行无人机操作
                     ua.historyTrackIdList.append(currentUgvId)
                     ua.historyEnergyList.append(ua.currentEnergy)
@@ -276,27 +277,27 @@ def generateStrategyList(formerStateList, currentStateList, distanceList, ugvLis
     无人机调度策略：[当前Id, 目标Id, 调度成本]
     """
     distance_matrix = np.array(distanceList)
-    print('原始距离矩阵：\n', distance_matrix)
+    # print('原始距离矩阵：\n', distance_matrix)
     delta_state = stateChange(formerStateList, currentStateList)
     cost_matrix, out_id_list, in_id_list = XYL.construct_cost_matrix(
         delta_state, distance_matrix)
-    print('out_id_list: ', out_id_list)
-    print('in_id_list: ', in_id_list)
-    print('优化目标矩阵：\n', cost_matrix)
+    # print('out_id_list: ', out_id_list)
+    # print('in_id_list: ', in_id_list)
+    # print('优化目标矩阵：\n', cost_matrix)
     out_id, in_id, cost_index, total_cost = XYL.optimize(cost_matrix)
-    print('输出方id：', out_id)  # 开销矩阵对应的行索引,对应于输出无人机的区域的列表指示器，需要与对应区域的ID映射
-    print('输入方id：', in_id)  # 对应行索引的最优指派的列索引，对应于输入无人机的区域的列表指示器，需要与对应区域的ID映射
-    # 提取每个行索引的最优指派列索引所在的元素的值索引，对应于无人机从输出点到输入点的飞行路径，需要与无人机绑定
-    print('对应cost：', cost_index)
-    print('总体cost：', total_cost)  # 提取每个行索引的最优指派列索引所在的元素值的综合，表示本次规划无人机共需要飞行的距离
+    # print('输出方id：', out_id)  # 开销矩阵对应的行索引,对应于输出无人机的区域的列表指示器，需要与对应区域的ID映射
+    # print('输入方id：', in_id)  # 对应行索引的最优指派的列索引，对应于输入无人机的区域的列表指示器，需要与对应区域的ID映射
+    # # 提取每个行索引的最优指派列索引所在的元素的值索引，对应于无人机从输出点到输入点的飞行路径，需要与无人机绑定
+    # print('对应cost：', cost_index)
+    # print('总体cost：', total_cost)  # 提取每个行索引的最优指派列索引所在的元素值的综合，表示本次规划无人机共需要飞行的距离
     system_strategy = []
     for i in range(len(out_id)):
         former = out_id_list[out_id[i]]
         current = in_id_list[in_id[i]]
         cost = cost_index[i]
         system_strategy.append([former, current, cost])
-    print(system_strategy)
-    # 对于不执行任何动作的无人机补齐调度策略，并按照无人机当前跟踪目标id从小到大排序
+    # print(system_strategy)
+    # 对于不执行任何动作的无人机补齐调度策略
     for k in range(len(delta_state)):
         if delta_state[k] >= 0:
             m = 0
@@ -308,12 +309,12 @@ def generateStrategyList(formerStateList, currentStateList, distanceList, ugvLis
             while m < currentStateList[k]:
                 system_strategy.append([k, k, 0])
                 m += 1
-    print(system_strategy)
+    # 按照无人机当前跟踪目标id从小到大对列表排序
     for i in range(len(system_strategy)):
         for j in range(0, len(system_strategy) - i - 1):
             if system_strategy[j][0] > system_strategy[j + 1][0]:
                 system_strategy[j], system_strategy[j + 1] = system_strategy[j + 1], system_strategy[j]
-    print(system_strategy)
+    # print(system_strategy)
     return system_strategy
 
 def generateClusterStrategyList(strategyList):
