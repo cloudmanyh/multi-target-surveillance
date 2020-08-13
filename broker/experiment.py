@@ -162,23 +162,23 @@ if __name__ == "__main__":
                     break
     # 进入调度算法环节
     if paraTags.algChoose == 1:
-        filePath = 'First_Come_First_Out/'
+        filePath = 'First_Come_First_Out_XYL/'
         initFileDir(filePath)
         broker = Broker(uavList, ugvList, ugvStateList,
                         distanceList, colorDict, filePath)
-        broker.First_Come_First_Out()
+        broker.First_Come_First_Out_XYL()
     elif paraTags.algChoose == 2:
-        filePath = 'Energy_High_First_Out/'
+        filePath = 'Energy_High_First_Out_XYL/'
         initFileDir(filePath)
         broker = Broker(uavList, ugvList, ugvStateList,
                         distanceList, colorDict, filePath)
-        broker.Energy_High_First_Out()
-    # elif paraTags.algChoose == 3:
-    #     filePath = 'Load_Balance_By_Cooperation/'
-    #     initFileDir(filePath)
-    #     broker = Broker(uavList, ugvList, ugvStateList,
-    #                     distanceList, colorDict, filePath)
-    #     broker.Load_Balance_By_Cooperation()
+        broker.Energy_High_First_Out_XYL()
+    elif paraTags.algChoose == 3:
+        filePath = 'First_Come_First_Out_Greedy/'
+        initFileDir(filePath)
+        broker = Broker(uavList, ugvList, ugvStateList,
+                        distanceList, colorDict, filePath)
+        broker.First_Come_First_Out_Greedy()
     # elif paraTags.algChoose == 4:
     #     filePath = 'Load_Balance_Energy_Efficient/'
     #     initFileDir(filePath)
