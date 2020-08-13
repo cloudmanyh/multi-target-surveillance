@@ -16,7 +16,7 @@ class paraTags:
     distance_upper = 4 # 两辆无人车之间距离上限
     distance_lower = 2 # 两辆无人车之间距离下限
     connectivity = 0.8
-    algChoose = 2 # 算法选择
+    algChoose = 4 # 算法选择
     # **********读写路径**********
     statePath = 'Experiment_Settings/stateList.csv'
     energyPath = 'Experiment_Settings/energyList.csv'
