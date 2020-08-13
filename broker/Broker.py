@@ -423,7 +423,6 @@ class Broker:
                           energyDict, self.filePath)
         print('仿真次数： ', simNum)
 
-
 # 将无人车的跟踪无人机列表和无人机聚类调度策略对应的合并，返回合并后的聚类策略
 def clusterListZip(uavList,clusterList):
     """
