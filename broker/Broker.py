@@ -14,7 +14,7 @@ from UGV import UGV
 from paraTags import paraTags
 import pandas as pd
 import graph
-import xiongyali as XYL
+import optimizer as opt
 plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
 plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
 
@@ -471,12 +471,12 @@ def generateStrategyList(formerStateList, currentStateList, distanceList, ugvLis
     distance_matrix = np.array(distanceList)
     # print('原始距离矩阵：\n', distance_matrix)
     delta_state = stateChange(formerStateList, currentStateList)
-    cost_matrix, out_id_list, in_id_list = XYL.construct_cost_matrix(
+    cost_matrix, out_id_list, in_id_list = opt.construct_cost_matrix(
         delta_state, distance_matrix)
     # print('out_id_list: ', out_id_list)
     # print('in_id_list: ', in_id_list)
     # print('优化目标矩阵：\n', cost_matrix)
-    out_id, in_id, cost_index, _ = XYL.optimize(cost_matrix)
+    out_id, in_id, cost_index, _ = opt.xiong_ya_li(cost_matrix)
     # print('输出方id：', out_id)  # 开销矩阵对应的行索引,对应于输出无人机的区域的列表指示器，需要与对应区域的ID映射
     # print('输入方id：', in_id)  # 对应行索引的最优指派的列索引，对应于输入无人机的区域的列表指示器，需要与对应区域的ID映射
     # # 提取每个行索引的最优指派列索引所在的元素的值索引，对应于无人机从输出点到输入点的飞行路径，需要与无人机绑定
@@ -488,25 +488,9 @@ def generateStrategyList(formerStateList, currentStateList, distanceList, ugvLis
         current = in_id_list[in_id[i]]
         cost = cost_index[i]
         system_strategy.append([former, current, cost])
-    # print(system_strategy)
-    # 对于不执行任何动作的无人机补齐调度策略
-    for k in range(len(delta_state)):
-        if delta_state[k] >= 0:
-            m = 0
-            while m < formerStateList[k]:
-                system_strategy.append([k, k, 0])
-                m += 1
-        if delta_state[k] < 0:
-            m = 0
-            while m < currentStateList[k]:
-                system_strategy.append([k, k, 0])
-                m += 1
-    # 按照无人机当前跟踪目标id从小到大对列表排序
-    for i in range(len(system_strategy)):
-        for j in range(0, len(system_strategy) - i - 1):
-            if system_strategy[j][0] > system_strategy[j + 1][0]:
-                system_strategy[j], system_strategy[j + 1] = system_strategy[j + 1], system_strategy[j]
-    # print(system_strategy)
+    print(system_strategy)
+    system_strategy = strategy_completion(
+        system_strategy, formerStateList, currentStateList)
     return system_strategy
 
 def strategy_completion(system_strategy, formerStateList, currentStateList):
@@ -535,6 +519,8 @@ def strategy_completion(system_strategy, formerStateList, currentStateList):
         for j in range(0, len(system_strategy) - i - 1):
             if system_strategy[j][0] > system_strategy[j + 1][0]:
                 system_strategy[j], system_strategy[j + 1] = system_strategy[j + 1], system_strategy[j]
+    print(system_strategy)
+    return system_strategy
 
 def generateClusterStrategyList(strategyList):
     """

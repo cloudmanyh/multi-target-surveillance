@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 '''
-@File        :   xiongyali.py
+@File        :   optimizer.py
 @Description :   匈牙利法目标构建与求解
 @Time        :   2020/08/13 12:17:45
 @Author      :   Yan Hui 
@@ -36,7 +36,7 @@ def construct_cost_matrix(delta_state, distance_matrix):
         cost_list.append(tmp_cost)
     return np.array(cost_list), out_id_list, in_id_list
 
-def optimize(cost):
+def xiong_ya_li(cost):
     """
     @description:
     匈牙利法找到最优分配方式
@@ -51,10 +51,47 @@ def optimize(cost):
     return out_id, in_id, cost_index, total_cost
 
 
+def greedy(cost):
+    """
+    @description:
+    贪婪算法找到最优分配方式
+    @param:
+    优化问题cost矩阵
+    @Returns:
+    输出点矩阵id列表，输入点id列表，分配成本列表，总体成本
+    """
+    temp_cost = cost.copy()
+    [rows, _] = temp_cost.shape
+    out_id = []
+    in_id = []
+    i = 0
+    while i < rows:
+        cost_row = temp_cost[i, :]
+        # print(cost_row)
+        # print('min value:', min(cost_row))
+        id = np.argmin(cost_row)
+        # print('id: ', id)
+        if id not in in_id:
+            out_id.append(i)
+            in_id.append(id)
+            # print('in_id: ', in_id)
+            i += 1
+        else:
+            cost_row[id] = max(cost_row) + 1
+    cost_index = cost[out_id, in_id]
+    total_cost = round(cost[out_id, in_id].sum(), 1)
+    return out_id, in_id, cost_index, total_cost
+
 if __name__ == "__main__":
     cost = np.random.randint(1, 9, (4, 4))
-    row_ind, col_ind, cost_ind, total_cost = optimize(cost)
+    print(cost)
+    row_ind, col_ind, cost_ind, total_cost = greedy(cost)
     print(row_ind)#开销矩阵对应的行索引,对应于输出无人机的区域的列表指示器，需要与对应区域的ID映射
     print(col_ind)#对应行索引的最优指派的列索引，对应于输入无人机的区域的列表指示器，需要与对应区域的ID映射
     print(cost_ind)#提取每个行索引的最优指派列索引所在的元素的值索引，对应于无人机从输出点到输入点的飞行路径，需要与无人机绑定
     print(total_cost)#提取每个行索引的最优指派列索引所在的元素值的综合，表示本次规划无人机共需要飞行的距离
+    row_ind1, col_ind1, cost_ind1, total_cost1 = xiong_ya_li(cost)
+    print(row_ind1)  # 开销矩阵对应的行索引,对应于输出无人机的区域的列表指示器，需要与对应区域的ID映射
+    print(col_ind1)  # 对应行索引的最优指派的列索引，对应于输入无人机的区域的列表指示器，需要与对应区域的ID映射
+    print(cost_ind1)  # 提取每个行索引的最优指派列索引所在的元素的值索引，对应于无人机从输出点到输入点的飞行路径，需要与无人机绑定
+    print(total_cost1)  # 提取每个行索引的最优指派列索引所在的元素值的综合，表示本次规划无人机共需要飞行的距离
