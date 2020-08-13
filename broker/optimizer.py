@@ -49,8 +49,7 @@ def xiong_ya_li(cost):
     cost_index = cost[out_id, in_id]
     total_cost = round(cost[out_id, in_id].sum(), 1)
     return out_id, in_id, cost_index, total_cost
-
-
+    
 def greedy(cost):
     """
     @description:
@@ -67,14 +66,10 @@ def greedy(cost):
     i = 0
     while i < rows:
         cost_row = temp_cost[i, :]
-        # print(cost_row)
-        # print('min value:', min(cost_row))
         id = np.argmin(cost_row)
-        # print('id: ', id)
         if id not in in_id:
             out_id.append(i)
             in_id.append(id)
-            # print('in_id: ', in_id)
             i += 1
         else:
             cost_row[id] = max(cost_row) + 1

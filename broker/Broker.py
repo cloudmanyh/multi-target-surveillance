@@ -38,7 +38,7 @@ class Broker:
     def First_Come_First_Out_XYL(self):
         """
         @description:
-        会议论文先到先出策略
+        先到先出策略,匈牙利法作为优化器
         @param:
         类成员函数
         @Returns:
@@ -70,14 +70,14 @@ class Broker:
                 continue
             # 系统状态发生了变化
             print('*********任务调度阶段*********')
-            strategyList = generateStrategyList(
+            strategyList = generateStrategyList_XYL(
                 formerStateList, currentStateList, self.distanceList, self.ugvList)
             clusterStrategyList = generateClusterStrategyList(strategyList)
             clusterUavList = []
             for k in range(len(clusterStrategyList)):
                 ugv_Id = clusterStrategyList[k][0][0]
                 ug = IdToUGV(ugv_Id, self.ugvList)
-                clusterUavList.append(ug.follow_UAV_Id_List)  
+                clusterUavList.append(ug.follow_UAV_Id_List)
             clusterStrategyList = clusterListZip(
                 clusterUavList, clusterStrategyList)
             print('聚类后的任务调度策略 ', clusterStrategyList)
@@ -134,7 +134,7 @@ class Broker:
     def Energy_High_First_Out_XYL(self):
         """
         @description:
-        会议论文先到先出策略
+        电量高的先出策略，匈牙利法作为优化器
         @param:
         类成员函数
         @Returns:
@@ -166,7 +166,7 @@ class Broker:
                 continue
             # 系统状态发生了变化
             print('*********任务调度阶段*********')
-            strategyList = generateStrategyList(
+            strategyList = generateStrategyList_XYL(
                 formerStateList, currentStateList, self.distanceList, self.ugvList)
             clusterStrategyList = generateClusterStrategyList(strategyList)
             clusterUavList = []
@@ -231,7 +231,7 @@ class Broker:
     def First_Come_First_Out_Greedy(self):
         """
         @description:
-        会议论文先到先出策略
+        先到先出策略，贪婪算法作为优化器
         @param:
         类成员函数
         @Returns:
@@ -263,15 +263,14 @@ class Broker:
                 continue
             # 系统状态发生了变化
             print('*********任务调度阶段*********')
-            strategyList = generateStrategyList(
+            strategyList = generateStrategyList_Greedy(
                 formerStateList, currentStateList, self.distanceList, self.ugvList)
             clusterStrategyList = generateClusterStrategyList(strategyList)
             clusterUavList = []
             for k in range(len(clusterStrategyList)):
                 ugv_Id = clusterStrategyList[k][0][0]
                 ug = IdToUGV(ugv_Id, self.ugvList)
-                follow_id_list = energySort(ug.follow_UAV_Id_List, self.uavList)
-                clusterUavList.append(follow_id_list)  
+                clusterUavList.append(ug.follow_UAV_Id_List)
             clusterStrategyList = clusterListZip(
                 clusterUavList, clusterStrategyList)
             print('聚类后的任务调度策略 ', clusterStrategyList)
@@ -324,6 +323,106 @@ class Broker:
         drawStatisticsBox(trackDisDict, trackTimeDict,
                           energyDict, self.filePath)
         print('仿真次数： ', simNum)
+
+    def Energy_High_First_Out_Greedy(self):
+        """
+        @description:
+        电量高的先出策略，贪婪算法作为优化器
+        @param:
+        类成员函数
+        @Returns:
+        无返回
+        """
+        # 从这里进入正式循环仿真过程
+        formerStateList = getStateList(self.stateList, 0)
+        simNum = 1
+        while simNum <= paraTags.simNum:
+            print('*********第 %s 轮仿真*********' % simNum)
+            currentStateList = getStateList(self.stateList, simNum)
+            # 系统状态变化，相应地更新无人车列表状态
+            for c in range(len(currentStateList)):
+                ug = self.ugvList[c]
+                ug.formerState = ug.currentState
+                ug.currentState = currentStateList[c]
+            ugvListPrint(self.ugvList)
+            stateDelta = stateChange(formerStateList, currentStateList)
+            if stateJudge(stateDelta) is False:
+                print('系统状态未变化')
+                for ua in self.uavList:
+                    ua.historyTrackIdList.append(ua.currentTrackId)
+                    ua.historyEnergyList.append(ua.currentEnergy)
+                # 画调度结果图
+                strategyShow(self.uavList, self.colorDict,
+                             simNum, self.filePath)
+                # 更新系统状态
+                simNum += 1  # 无论系统状态是否发生变化都算一轮仿真
+                continue
+            # 系统状态发生了变化
+            print('*********任务调度阶段*********')
+            strategyList = generateStrategyList_Greedy(
+                formerStateList, currentStateList, self.distanceList, self.ugvList)
+            clusterStrategyList = generateClusterStrategyList(strategyList)
+            clusterUavList = []
+            for k in range(len(clusterStrategyList)):
+                ugv_Id = clusterStrategyList[k][0][0]
+                ug = IdToUGV(ugv_Id, self.ugvList)
+                follow_id_list = energySort(
+                    ug.follow_UAV_Id_List, self.uavList)
+                clusterUavList.append(follow_id_list)
+            clusterStrategyList = clusterListZip(
+                clusterUavList, clusterStrategyList)
+            print('聚类后的任务调度策略 ', clusterStrategyList)
+            # 下面按照聚类后的调度策略进行任务调度
+            for k in range(len(clusterStrategyList)):
+                clusterTemp = clusterStrategyList[k]
+                for j in range(len(clusterTemp)):
+                    strategy = clusterTemp[j]
+                    if len(strategy) != 4:
+                        print('无人机调度策略格式不正确')
+                    # 依次读取当前无人车Id，目标无人车Id，执行任务无人机Id
+                    currentUgvId = strategy[0]
+                    currentUgv = IdToUGV(currentUgvId, self.ugvList)
+                    targetUgvId = strategy[1]
+                    targetUgv = IdToUGV(targetUgvId, self.ugvList)
+                    uaId = strategy[2]
+                    moveDistance = strategy[3]
+                    ua = IdToUAV(uaId, self.uavList)
+                    # 进行无人车操作
+                    if currentUgvId != targetUgvId:
+                        currentUgv.follow_UAV_Id_List.remove(uaId)  # 离开当前无人机
+                        targetUgv.follow_UAV_Id_List.append(uaId)  # 加入目标无人机
+                    # 进行无人机操作
+                    ua.historyTrackIdList.append(currentUgvId)
+                    ua.historyEnergyList.append(ua.currentEnergy)
+                    ua.currentTrackId = targetUgvId
+                    moveTime = round(moveDistance / ua.speed, 3)  # 计算无人机的飞行时长
+                    ua.motionTime += moveTime
+                    energyCost = round(
+                        moveTime * ua.energyPower, 3)  # 计算无人机的飞行能耗
+                    ua.currentEnergy = ua.currentEnergy - energyCost
+            print('********无人机和无人车列表信息更新********')
+            uavListPrint(self.uavList)
+            ugvListPrint(self.ugvList)
+            # 画调度结果图
+            strategyShow(self.uavList, self.colorDict, simNum, self.filePath)
+            # 更新系统状态
+            formerStateList = currentStateList
+            simNum += 1
+            # 当系统中出现某个无人机电量低于阈值则仿真结束
+            if uavEenergyJudge(self.uavList) is False:
+                break
+            # 画每一架无人机跟踪状态图
+        uavTrackShow(self.uavList, self.colorDict, simNum, self.filePath)
+        overallTrackDisList, overallTrackTimeList, overallEnergyList = uavStatistics(
+            self.uavList)
+        statisticsTrendShow(overallTrackDisList, overallTrackTimeList,
+                            overallEnergyList, self.colorDict, self.filePath)
+        trackDisDict, trackTimeDict, energyDict = generateStatisticsDict(
+            overallTrackDisList, overallTrackTimeList, overallEnergyList)
+        drawStatisticsBox(trackDisDict, trackTimeDict,
+                          energyDict, self.filePath)
+        print('仿真次数： ', simNum)
+
 
 # 将无人车的跟踪无人机列表和无人机聚类调度策略对应的合并，返回合并后的聚类策略
 def clusterListZip(uavList,clusterList):
@@ -459,29 +558,46 @@ def generateStateMatrix(stateList, uavNum):
     systemMatrix = np.array(systemList)
     return systemMatrix
 
-def generateStrategyList(formerStateList, currentStateList, distanceList, ugvList):
+def generateStrategyList_XYL(formerStateList, currentStateList, distanceList, ugvList):
     """
     @description:
-    生成无人机调度策略列表
+    生成无人机调度策略列表,优化器使用匈牙利法
     @param:
     目标上一时刻状态列表，目标当前时刻状态列表，无人车列表
     @Returns:
     无人机调度策略：[当前Id, 目标Id, 调度成本]
     """
     distance_matrix = np.array(distanceList)
-    # print('原始距离矩阵：\n', distance_matrix)
     delta_state = stateChange(formerStateList, currentStateList)
     cost_matrix, out_id_list, in_id_list = opt.construct_cost_matrix(
         delta_state, distance_matrix)
-    # print('out_id_list: ', out_id_list)
-    # print('in_id_list: ', in_id_list)
-    # print('优化目标矩阵：\n', cost_matrix)
     out_id, in_id, cost_index, _ = opt.xiong_ya_li(cost_matrix)
-    # print('输出方id：', out_id)  # 开销矩阵对应的行索引,对应于输出无人机的区域的列表指示器，需要与对应区域的ID映射
-    # print('输入方id：', in_id)  # 对应行索引的最优指派的列索引，对应于输入无人机的区域的列表指示器，需要与对应区域的ID映射
-    # # 提取每个行索引的最优指派列索引所在的元素的值索引，对应于无人机从输出点到输入点的飞行路径，需要与无人机绑定
-    # print('对应cost：', cost_index)
-    # print('总体cost：', total_cost)  # 提取每个行索引的最优指派列索引所在的元素值的综合，表示本次规划无人机共需要飞行的距离
+    system_strategy = []
+    for i in range(len(out_id)):
+        former = out_id_list[out_id[i]]
+        current = in_id_list[in_id[i]]
+        cost = cost_index[i]
+        system_strategy.append([former, current, cost])
+    print(system_strategy)
+    system_strategy = strategy_completion(
+        system_strategy, formerStateList, currentStateList)
+    return system_strategy
+
+
+def generateStrategyList_Greedy(formerStateList, currentStateList, distanceList, ugvList):
+    """
+    @description:
+    生成无人机调度策略列表,优化器使用贪婪法
+    @param:
+    目标上一时刻状态列表，目标当前时刻状态列表，无人车列表
+    @Returns:
+    无人机调度策略：[当前Id, 目标Id, 调度成本]
+    """
+    distance_matrix = np.array(distanceList)
+    delta_state = stateChange(formerStateList, currentStateList)
+    cost_matrix, out_id_list, in_id_list = opt.construct_cost_matrix(
+        delta_state, distance_matrix)
+    out_id, in_id, cost_index, _ = opt.greedy(cost_matrix)
     system_strategy = []
     for i in range(len(out_id)):
         former = out_id_list[out_id[i]]
