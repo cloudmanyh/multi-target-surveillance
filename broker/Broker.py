@@ -77,6 +77,102 @@ class Broker:
             for k in range(len(clusterStrategyList)):
                 ugv_Id = clusterStrategyList[k][0][0]
                 ug = IdToUGV(ugv_Id, self.ugvList)
+                clusterUavList.append(ug.follow_UAV_Id_List)  
+            clusterStrategyList = clusterListZip(
+                clusterUavList, clusterStrategyList)
+            print('聚类后的任务调度策略 ', clusterStrategyList)
+            # 下面按照聚类后的调度策略进行任务调度
+            for k in range(len(clusterStrategyList)):
+                clusterTemp = clusterStrategyList[k]
+                for j in range(len(clusterTemp)):
+                    strategy = clusterTemp[j]
+                    if len(strategy) != 4:
+                        print('无人机调度策略格式不正确')
+                    # 依次读取当前无人车Id，目标无人车Id，执行任务无人机Id
+                    currentUgvId = strategy[0]
+                    currentUgv = IdToUGV(currentUgvId, self.ugvList)
+                    targetUgvId = strategy[1]
+                    targetUgv = IdToUGV(targetUgvId, self.ugvList)
+                    uaId = strategy[2]
+                    moveDistance = strategy[3]
+                    ua = IdToUAV(uaId, self.uavList)
+                    # 进行无人车操作
+                    if currentUgvId != targetUgvId:
+                        currentUgv.follow_UAV_Id_List.remove(uaId)  # 离开当前无人机
+                        targetUgv.follow_UAV_Id_List.append(uaId)  # 加入目标无人机
+                    # 进行无人机操作
+                    ua.historyTrackIdList.append(currentUgvId)
+                    ua.historyEnergyList.append(ua.currentEnergy)
+                    ua.currentTrackId = targetUgvId
+                    moveTime = round(moveDistance / ua.speed, 3)  # 计算无人机的飞行时长
+                    ua.motionTime += moveTime
+                    energyCost = round(moveTime * ua.energyPower, 3)  # 计算无人机的飞行能耗
+                    ua.currentEnergy = ua.currentEnergy - energyCost
+            print('********无人机和无人车列表信息更新********')
+            uavListPrint(self.uavList)
+            ugvListPrint(self.ugvList)
+            # 画调度结果图
+            strategyShow(self.uavList, self.colorDict, simNum, self.filePath)
+            # 更新系统状态
+            formerStateList = currentStateList
+            simNum += 1
+            # 当系统中出现某个无人机电量低于阈值则仿真结束
+            if uavEenergyJudge(self.uavList) is False:
+                break
+            # 画每一架无人机跟踪状态图
+        uavTrackShow(self.uavList, self.colorDict, simNum, self.filePath)
+        overallTrackDisList, overallTrackTimeList, overallEnergyList = uavStatistics(
+            self.uavList)
+        statisticsTrendShow(overallTrackDisList, overallTrackTimeList,
+                            overallEnergyList, self.colorDict, self.filePath)
+        trackDisDict, trackTimeDict, energyDict = generateStatisticsDict(
+            overallTrackDisList, overallTrackTimeList, overallEnergyList)
+        drawStatisticsBox(trackDisDict, trackTimeDict,
+                          energyDict, self.filePath)
+        print('仿真次数： ', simNum)
+
+    def Energy_High_First_Out(self):
+        """
+        @description:
+        会议论文先到先出策略
+        @param:
+        类成员函数
+        @Returns:
+        无返回
+        """
+        # 从这里进入正式循环仿真过程
+        formerStateList = getStateList(self.stateList, 0)
+        simNum = 1
+        while simNum <= paraTags.simNum:
+            print('*********第 %s 轮仿真*********' % simNum)
+            currentStateList = getStateList(self.stateList, simNum)
+            # 系统状态变化，相应地更新无人车列表状态
+            for c in range(len(currentStateList)):
+                ug = self.ugvList[c]
+                ug.formerState = ug.currentState
+                ug.currentState = currentStateList[c]
+            ugvListPrint(self.ugvList)
+            stateDelta = stateChange(formerStateList, currentStateList)
+            if stateJudge(stateDelta) is False:
+                print('系统状态未变化')
+                for ua in self.uavList:
+                    ua.historyTrackIdList.append(ua.currentTrackId)
+                    ua.historyEnergyList.append(ua.currentEnergy)
+                # 画调度结果图
+                strategyShow(self.uavList, self.colorDict,
+                             simNum, self.filePath)
+                # 更新系统状态
+                simNum += 1  # 无论系统状态是否发生变化都算一轮仿真
+                continue
+            # 系统状态发生了变化
+            print('*********任务调度阶段*********')
+            strategyList = generateStrategyList(
+                formerStateList, currentStateList, self.distanceList, self.ugvList)
+            clusterStrategyList = generateClusterStrategyList(strategyList)
+            clusterUavList = []
+            for k in range(len(clusterStrategyList)):
+                ugv_Id = clusterStrategyList[k][0][0]
+                ug = IdToUGV(ugv_Id, self.ugvList)
                 follow_id_list = energySort(ug.follow_UAV_Id_List, self.uavList)
                 clusterUavList.append(follow_id_list)  
             clusterStrategyList = clusterListZip(
@@ -131,7 +227,6 @@ class Broker:
         drawStatisticsBox(trackDisDict, trackTimeDict,
                           energyDict, self.filePath)
         print('仿真次数： ', simNum)
-
 
 # 将无人车的跟踪无人机列表和无人机聚类调度策略对应的合并，返回合并后的聚类策略
 def clusterListZip(uavList,clusterList):

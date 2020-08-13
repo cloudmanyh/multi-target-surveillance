@@ -167,12 +167,12 @@ if __name__ == "__main__":
         broker = Broker(uavList, ugvList, ugvStateList,
                         distanceList, colorDict, filePath)
         broker.First_Come_First_Out()
-    # elif paraTags.algChoose == 2:
-    #     filePath = 'Energy_High_First_Out/'
-    #     initFileDir(filePath)
-    #     broker = Broker(uavList, ugvList, ugvStateList,
-    #                     distanceList, colorDict, filePath)
-    #     broker.Energy_High_First_Out()
+    elif paraTags.algChoose == 2:
+        filePath = 'Energy_High_First_Out/'
+        initFileDir(filePath)
+        broker = Broker(uavList, ugvList, ugvStateList,
+                        distanceList, colorDict, filePath)
+        broker.Energy_High_First_Out()
     # elif paraTags.algChoose == 3:
     #     filePath = 'Load_Balance_By_Cooperation/'
     #     initFileDir(filePath)
