@@ -74,11 +74,11 @@ class Broker:
                 formerStateList, currentStateList, self.distanceList, paraTags.uavNum)
             clusterStrategyList = generateClusterStrategyList(strategyList)
             clusterUavList = []
-            for k in range(len(self.ugvList)):
-                ug = self.ugvList[k]
-                if len(ug.follow_UAV_Id_List) > 0:
-                    follow_id_list = energySort(ug.follow_UAV_Id_List, self.uavList)
-                    clusterUavList.append(follow_id_list)
+            for k in range(len(clusterStrategyList)):
+                ugv_Id = clusterStrategyList[k][0][0]
+                ug = IdToUGV(ugv_Id, self.ugvList)
+                follow_id_list = energySort(ug.follow_UAV_Id_List, self.uavList)
+                clusterUavList.append(follow_id_list)  
             clusterStrategyList = clusterListZip(
                 clusterUavList, clusterStrategyList)
             print('聚类后的任务调度策略 ', clusterStrategyList)
@@ -158,7 +158,7 @@ def clusterListZip(uavList,clusterList):
             else:
                 print('无人车上跟踪无人机数量与调度策略数量不一致')
     else:
-        print('无人车聚类与调度策略聚类数量不一致')
+        
     return clusterList
 
 def getStateList(stateList, index):
@@ -333,9 +333,7 @@ def generateClusterStrategyList(strategyList):
         n = len(cluster)
         for i in range(n):
             for j in range(0, n - i - 1):
-                strategy0 = cluster[j]
-                strategy1 = cluster[j + 1]
-                if strategy0[-1] < strategy1[-1]:
+                if cluster[j][-1] < cluster[j + 1][-1]:
                     cluster[j], cluster[j + 1] = cluster[j + 1], cluster[j]
     return clusterList
 
