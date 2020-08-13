@@ -1,3 +1,12 @@
+# -*- encoding: utf-8 -*-
+'''
+@File        :   graph.py
+@Description :   加权无向图建模与求解
+@Time        :   2020/08/13 12:16:37
+@Author      :   Yan Hui 
+@Version     :   1.0
+@Contact     :   yanhui13@nudt.edu.cn
+'''
 import random
 import numpy as np  # 使用import导入模块numpy，并简写成np
 from paraTags import paraTags

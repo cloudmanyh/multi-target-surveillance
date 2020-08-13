@@ -1,3 +1,12 @@
+# -*- encoding: utf-8 -*-
+'''
+@File        :   paraTags.py
+@Description :   实验参数设置
+@Time        :   2020/08/13 12:12:30
+@Author      :   Yan Hui 
+@Version     :   1.0
+@Contact     :   yanhui13@nudt.edu.cn
+'''
 class paraTags:
     # 定义控制实验的相关参数
     # **********系统参数**********

@@ -1,3 +1,12 @@
+# -*- encoding: utf-8 -*-
+'''
+@File        :   expSetting.py
+@Description :   实验设置
+@Time        :   2020/08/13 12:15:46
+@Author      :   Yan Hui 
+@Version     :   1.0
+@Contact     :   yanhui13@nudt.edu.cn
+'''
 import pandas as pd
 import numpy as np  # 使用import导入模块numpy，并简写成np
 import random

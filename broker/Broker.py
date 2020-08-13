@@ -1,10 +1,11 @@
-# -*- encoding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 '''
-@File    :   Broker.py
-@Time    :   2020/08/11 09:22:36
-@Author  :   Yan Hui 
-@Version :   1.0
-@Contact :   yanhui13@nudt.edu.cn
+@File        :   Broker.py
+@Description :   调度算法
+@Time        :   2020/08/13 12:13:10
+@Author      :   Yan Hui 
+@Version     :   1.0
+@Contact     :   yanhui13@nudt.edu.cn
 '''
 import numpy as np  # 使用import导入模块numpy，并简写成np
 import matplotlib.pyplot as plt  # 使用import导入模块matplotlib.pyplot，并简写成plt
@@ -118,7 +119,6 @@ class Broker:
             strategyShow(self.uavList, self.colorDict, simNum, self.filePath)
             # 更新系统状态
             formerStateList = currentStateList
-            failNumList.append(failNum)
             simNum += 1
             # 当系统中出现某个无人机电量低于阈值则仿真结束
             if uavEenergyJudge(self.uavList) is False:
@@ -572,9 +572,14 @@ def energySort(uavIdList, uavList):
 
 # 找到一个二维列表中最大值和最小值
 def find_2DList_Max_Min_Value(data_2DList):
-    '''
-    功能：找到矩阵最大值和最小值
-    '''
+    """
+    @description:
+    找到一个二维列表中最大值和最小值
+    @param:
+    二维列表
+    @Returns:
+    最大值，最小值
+    """
     max_data = []
     min_data = []
     for i in range(len(data_2DList)):
@@ -594,5 +599,13 @@ def guaranteeRatioRecording(failNumList, filePath):
 
 # 将list变量存为CSV文件
 def writeList2CSV(myList,filePath):
+    """
+    @description:
+    将列表中数据存为csv数据格式文件
+    @param:
+    列表，存储文件路径
+    @Returns:
+    无返回
+    """
     writer = pd.DataFrame(data=myList) #先把list转化为panda的frame格式，然后存为csv
     writer.to_csv(filePath, encoding='gbk')

@@ -1,10 +1,11 @@
-# -*- encoding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 '''
-@File    :   xiongyali.py
-@Time    :   2020/08/11 10:41:13
-@Author  :   Yan Hui 
-@Version :   1.0
-@Contact :   yanhui13@nudt.edu.cn
+@File        :   xiongyali.py
+@Description :   匈牙利法目标构建与求解
+@Time        :   2020/08/13 12:17:45
+@Author      :   Yan Hui 
+@Version     :   1.0
+@Contact     :   yanhui13@nudt.edu.cn
 '''
 from scipy.optimize import linear_sum_assignment
 import numpy as np  

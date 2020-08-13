@@ -1,3 +1,12 @@
+# -*- encoding: utf-8 -*-
+'''
+@File        :   experiment.py
+@Description :   实验入口
+@Time        :   2020/08/13 12:15:17
+@Author      :   Yan Hui 
+@Version     :   1.0
+@Contact     :   yanhui13@nudt.edu.cn
+'''
 import numpy as np  # 使用import导入模块numpy，并简写成np
 import matplotlib.pyplot as plt  # 使用import导入模块matplotlib.pyplot，并简写成plt
 import pandas as pd

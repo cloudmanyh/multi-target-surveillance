@@ -1,10 +1,11 @@
-# -*- encoding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 '''
-Filename         :gene_beta.py
-Description      :
-Time             :2020/08/10 23:22:38
-Author           :Yan Hui
-Version          :1.0
+@File        :   gene_beta.py
+@Description :   差分进化遗传算法
+@Time        :   2020/08/13 12:16:14
+@Author      :   Yan Hui 
+@Version     :   1.0
+@Contact     :   yanhui13@nudt.edu.cn
 '''
 import random
 import math
