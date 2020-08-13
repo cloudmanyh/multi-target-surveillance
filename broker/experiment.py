@@ -179,11 +179,11 @@ if __name__ == "__main__":
         broker = Broker(uavList, ugvList, ugvStateList,
                         distanceList, colorDict, filePath)
         broker.First_Come_First_Out_Greedy()
-    # elif paraTags.algChoose == 4:
-    #     filePath = 'Load_Balance_Energy_Efficient/'
-    #     initFileDir(filePath)
-    #     broker = Broker(uavList, ugvList, ugvStateList,
-    #                     distanceList, colorDict, filePath)
-    #     broker.Load_Balance_Energy_Efficient()
+    elif paraTags.algChoose == 4:
+        filePath = 'Energy_High_First_Out_Greedy/'
+        initFileDir(filePath)
+        broker = Broker(uavList, ugvList, ugvStateList,
+                        distanceList, colorDict, filePath)
+        broker.Energy_High_First_Out_Greedy()
     else:
         print('没有选择任何算法')
