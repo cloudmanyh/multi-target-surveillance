@@ -162,40 +162,41 @@ if __name__ == "__main__":
                     break
     # 进入调度算法环节
     if paraTags.algChoose == 1:
-        filePath = 'First_Come_First_Out_XYL/'
-        initFileDir(filePath)
-        broker = Broker(uavList, ugvList, ugvStateList,
-                        distanceList, colorDict, filePath)
-        broker.First_Come_First_Out_XYL()
-    elif paraTags.algChoose == 2:
         filePath = 'Energy_High_First_Out_XYL/'
         initFileDir(filePath)
         broker = Broker(uavList, ugvList, ugvStateList,
                         distanceList, colorDict, filePath)
         broker.Energy_High_First_Out_XYL()
-    elif paraTags.algChoose == 3:
-        filePath = 'First_Come_First_Out_Greedy/'
+    elif paraTags.algChoose == 2:
+        filePath = 'First_Come_First_Out_XYL/'
         initFileDir(filePath)
         broker = Broker(uavList, ugvList, ugvStateList,
                         distanceList, colorDict, filePath)
-        broker.First_Come_First_Out_Greedy()
+        broker.First_Come_First_Out_XYL()
+    # elif paraTags.algChoose == 3:
+    #     filePath = 'First_Come_First_Out_Greedy/'
+    #     initFileDir(filePath)
+    #     broker = Broker(uavList, ugvList, ugvStateList,
+    #                     distanceList, colorDict, filePath)
+    #     broker.First_Come_First_Out_Greedy()
+    elif paraTags.algChoose == 3:
+        filePath = 'Energy_High_First_Out_Random/'
+        initFileDir(filePath)
+        broker = Broker(uavList, ugvList, ugvStateList,
+                        distanceList, colorDict, filePath)
+        broker.Energy_High_First_Out_Random()
+        
+    # elif paraTags.algChoose == 5:
+    #     filePath = 'First_Come_First_Out_Random/'
+    #     initFileDir(filePath)
+    #     broker = Broker(uavList, ugvList, ugvStateList,
+    #                     distanceList, colorDict, filePath)
+    #     broker.First_Come_First_Out_Random()
     elif paraTags.algChoose == 4:
         filePath = 'Energy_High_First_Out_Greedy/'
         initFileDir(filePath)
         broker = Broker(uavList, ugvList, ugvStateList,
                         distanceList, colorDict, filePath)
         broker.Energy_High_First_Out_Greedy()
-    elif paraTags.algChoose == 5:
-        filePath = 'First_Come_First_Out_Random/'
-        initFileDir(filePath)
-        broker = Broker(uavList, ugvList, ugvStateList,
-                        distanceList, colorDict, filePath)
-        broker.First_Come_First_Out_Random()
-    elif paraTags.algChoose == 6:
-        filePath = 'Energy_High_First_Out_Random/'
-        initFileDir(filePath)
-        broker = Broker(uavList, ugvList, ugvStateList,
-                        distanceList, colorDict, filePath)
-        broker.Energy_High_First_Out_Random()
     else:
         print('没有选择任何算法')

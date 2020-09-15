@@ -18,6 +18,10 @@ import optimizer as opt
 plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
 plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
 
+font1 = {'family': 'Times New Roman',
+'weight': 'normal',
+'size': 10,
+}
 class Broker:
     # 定义类的变量
     uavList = list()
@@ -986,6 +990,7 @@ def uavStatistics(uavList):
     overallTrackDisList = []
     overallTrackTimeList = []
     overallEnergyList = []
+    length_result = readCSV2List(paraTags.graphLengthPath)
     for ua in uavList:
         trackDisList = []
         trackTimeList = []
@@ -1001,10 +1006,10 @@ def uavStatistics(uavList):
             else:
                 xStart = ua.historyTrackIdList[k]
                 xEnd = ua.currentTrackId
-            trackDis = abs(xStart - xEnd) * paraTags.trackDis
+            trackDis = length_result[xStart][xEnd]
             trackTime = trackDis / ua.speed
-            accumulativeTrackDis += trackDis * 1000
-            accumulativeTrackTime += trackTime * 3600
+            accumulativeTrackDis += trackDis
+            accumulativeTrackTime += trackTime
             trackDisList.append(accumulativeTrackDis)
             trackTimeList.append(accumulativeTrackTime)
         overallTrackDisList.append(trackDisList)
@@ -1019,11 +1024,11 @@ def statisticsTrendShow(overallTrackDisList,overallTrackTimeList,overallEnergyLi
     fileName = filePath + 'energy/energyList.csv'
     writeList2CSV(overallEnergyList, fileName)
 
-    figName = filePath + 'track/UAV_TrackDis_Trend.jpg'
+    figName = filePath + 'track/UAV_TrackDis_Trend.pdf'
     trendShow(overallTrackDisList, colorDict, figName)
-    figName = filePath + 'track/UAV_TrackTime_Trend.jpg'
+    figName = filePath + 'track/UAV_TrackTime_Trend.pdf'
     trendShow(overallTrackTimeList, colorDict, figName)
-    figName = filePath + 'energy/UAV_Energy_Trend.jpg'
+    figName = filePath + 'energy/UAV_Energy_Trend.pdf'
     trendShow(overallEnergyList, colorDict, figName)
 
 def trendShow(overallTrackList, colorDict, figName):
@@ -1073,9 +1078,16 @@ def drawBoxPlot(dataDict, figName, statisticsPath):
     statisticsName = figName.split('/')[0] + '/' + statisticsPath
     df = pd.DataFrame(dataDict)
     print(df)
-    df.plot.box(title=figName.split('/')[0])
-    plt.xlabel('仿真次数')
-    plt.ylabel(figName.split('/')[-1].split('_')[1])
+    df.plot.box()
+    plt.xlabel('Simulation Number')
+    flag = figName.split('/')[-1].split('_')[1]
+    if flag == 'Energy':
+        y_lable = 'Battery Capacity'
+    elif flag == 'TrackDis':
+        y_lable = 'Maneuvering Distance'
+    elif flag == 'TrackTime':
+        y_lable = 'Maneuvering Time'
+    plt.ylabel(y_lable)
     plt.grid(linestyle="--", alpha=0.8)
     plt.savefig(figName)
     # 将箱线图的统计参数存为csv格式的文件
@@ -1084,11 +1096,11 @@ def drawBoxPlot(dataDict, figName, statisticsPath):
     plt.show()
 
 def drawStatisticsBox(trackDisDict, trackTimeDict, energyDict, filePath):
-    figName = filePath + 'track/UAV_TrackDis_Trend.jpg'
+    figName = filePath + 'track/UAV_TrackDis_Trend.pdf'
     drawBoxPlot(trackDisDict, figName, paraTags.trackDisStatisticsPath)
-    figName = filePath + 'track/UAV_TrackTime_Trend.jpg'
+    figName = filePath + 'track/UAV_TrackTime_Trend.pdf'
     drawBoxPlot(trackTimeDict, figName, paraTags.trackTimeStatisticsPath)
-    figName = filePath + 'energy/System_Energy_Statistics.jpg'
+    figName = filePath + 'energy/System_Energy_Statistics.pdf'
     drawBoxPlot(energyDict, figName, paraTags.energyStatisticsPath)
 
 
@@ -1160,3 +1172,34 @@ def writeList2CSV(myList,filePath):
     """
     writer = pd.DataFrame(data=myList) #先把list转化为panda的frame格式，然后存为csv
     writer.to_csv(filePath, encoding='gbk')
+
+# 将混合列表转化为一维列表
+def flatten(input_list):
+    output_list = []
+    while True:
+        if input_list == []:
+            break
+        for index, value in enumerate(input_list):
+            # index :索引序列  value:索引序列对应的值
+            # enumerate() 函数用于将一个可遍历的数据对象(如列表、元组或字符串)组合为一个索引序列，
+            # 同时列出数据和数据下标，一般用在 for 循环当中。
+            if type(value)== list:
+                input_list = value + input_list[index+1:]
+                break   # 这里跳出for循环后，从While循环进入的时候index是更新后的input_list新开始算的。
+            else:
+                output_list.append(value)
+                input_list.pop(index)
+                break
+    return output_list
+
+# 读入CSV文件并存为list类型
+def readCSV2List(filePath):
+    corpus = pd.read_csv(filePath)
+    result = corpus.values.tolist()
+    for k in range(len(result)):
+        tempList = result[k]
+        del tempList[0]
+    if len(result[0]) == 1:
+        # 说明二维列表内部列表只有一个变量，本质上是一维列表，压缩为一维列表
+        result = flatten(result)
+    return result

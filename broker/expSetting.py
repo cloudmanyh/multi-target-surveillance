@@ -117,22 +117,22 @@ def uavParaSetting():
     uavParaList = list()
     for k in range(paraTags.uavNum):
         uavState = []
-        uavState.append(paraTags.uavEnergy2)
-        uavState.append(paraTags.uavEnergyPower2)
-        uavState.append(paraTags.uavSpeed2)
-        # uavType = random.randint(1, 1)
-        # if uavType == 1:
-        #     uavState.append(paraTags.uavEnergy1)
-        #     uavState.append(paraTags.uavEnergyPower1)
-        #     uavState.append(paraTags.uavSpeed1)
-        # elif uavType == 2:
-        #     uavState.append(paraTags.uavEnergy2)
-        #     uavState.append(paraTags.uavEnergyPower2)
-        #     uavState.append(paraTags.uavSpeed2)
-        # else:
-        #     uavState.append(paraTags.uavEnergy3)
-        #     uavState.append(paraTags.uavEnergyPower3)
-        #     uavState.append(paraTags.uavSpeed3)
+        # uavState.append(paraTags.uavEnergy2)
+        # uavState.append(paraTags.uavEnergyPower2)
+        # uavState.append(paraTags.uavSpeed2)
+        uavType = random.randint(1, 3)
+        if uavType == 1:
+            uavState.append(paraTags.uavEnergy1)
+            uavState.append(paraTags.uavEnergyPower1)
+            uavState.append(paraTags.uavSpeed1)
+        elif uavType == 2:
+            uavState.append(paraTags.uavEnergy2)
+            uavState.append(paraTags.uavEnergyPower2)
+            uavState.append(paraTags.uavSpeed2)
+        else:
+            uavState.append(paraTags.uavEnergy3)
+            uavState.append(paraTags.uavEnergyPower3)
+            uavState.append(paraTags.uavSpeed3)
         uavParaList.append(uavState)
     writeList2CSV(uavParaList, paraTags.energyPath)
     energyResult = readCSV2List(paraTags.energyPath)
@@ -160,6 +160,18 @@ def graph_setting():
     print('节点间距离矩阵：\n',length_result)
     print('最短间距路径：\n',track_result)
     graph.draw_graph(G, node_labels, edge_labels)
+
+# # 根据目标数量和目标间连接度生成目标无向图
+# def graph_setting():
+#     length_list=[
+#         [0.0,1.0,0.3,0.5,0.7], 
+#         [1.0,0.0,0.7,0.6,0.5], 
+#         [0.3,0.7,0.0,0.8,0.4], 
+#         [0.5,0.6,0.8,0.0,0.9], 
+#         [0.7,0.5,0.4,0.9,0.0]]
+#     writeList2CSV(length_list, paraTags.graphLengthPath)
+#     length_result = readCSV2List(paraTags.graphLengthPath)
+#     print('节点间距离矩阵：\n',length_result)
 
 
 if __name__ == "__main__":

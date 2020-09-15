@@ -129,10 +129,10 @@ def draw_graph(graph, node_labels, edge_labels):
     nx.draw_networkx_labels(graph,pos,node_labels,font_size=16, font_color='#000000') # 把节点的标签画出来
     nx.draw_networkx_edge_labels(graph, pos, edge_labels) # 把边权重画出来 
     #显示graph
-    plt.title('有权图')
     plt.axis('on')
     plt.xticks([])
     plt.yticks([])
+    plt.savefig('graph.pdf')
     plt.show()
 
 if __name__ == "__main__":
